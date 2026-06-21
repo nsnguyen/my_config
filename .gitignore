@@ -1,0 +1,5 @@
+# never commit machine-local secrets
+.zshrc.local
+*.local
+
+.DS_Store
