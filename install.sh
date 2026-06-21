@@ -21,7 +21,11 @@ fetch functions.zsh > "$ZDIR/functions.zsh"
 
 if command -v brew >/dev/null 2>&1; then
   say "Installing dependencies (brew bundle)"
-  tmp="$(mktemp)"; fetch Brewfile > "$tmp"; brew bundle --file="$tmp" || true; rm -f "$tmp"
+  tmp="$(mktemp)"; fetch Brewfile > "$tmp"
+  # NO_INSTALL_CLEANUP: skip the post-install `brew cleanup` (it can choke on a
+  # stale download cache and falsely report "Upgrading X has failed").
+  HOMEBREW_NO_INSTALL_CLEANUP=1 HOMEBREW_NO_ENV_HINTS=1 brew bundle --file="$tmp" || true
+  rm -f "$tmp"
 else
   warn "Homebrew not found — install it from https://brew.sh, then re-run."
 fi
