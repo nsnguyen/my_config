@@ -10,7 +10,7 @@ function show_aliases() {
   echo "\n📚 Available Aliases:\n"
   echo "Help & Config:"
   echo "  help                   - Show this help message"
-  echo "  zshrc                  - View .zshrc file"
+  echo "  zshrc                  - Edit .zshrc (open in VS Code)"
   echo "  reload                 - Reload .zshrc configuration"
   echo "  funcs                  - Edit dev functions/aliases (this toolkit)"
   echo "  secrets                - Edit API keys / machine-local (~/.zshrc.local)"
@@ -233,7 +233,7 @@ function git_diff_viewer() {
 # --------------------------------- aliases ----------------------------------
 # Help & config
 alias help='show_aliases'
-alias zshrc='bat ~/.zshrc || cat ~/.zshrc'
+alias zshrc='code ~/.zshrc'
 alias reload='source ~/.zshrc && echo "✓ .zshrc reloaded"'
 alias funcs='code ~/.config/zsh/functions.zsh'   # edit this toolkit (the file your shell loads)
 alias secrets='code ~/.zshrc.local'              # edit API keys / machine-local config
