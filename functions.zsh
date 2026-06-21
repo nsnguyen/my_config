@@ -5,6 +5,31 @@
 #  Machine-specific bits (secrets, claude-mem) live in ~/.zshrc.local instead.
 # ============================================================================
 
+# ---------------------------------------------------------------------------
+# Tab-toggle preview scrolling for the fzf finders.
+# Tab flips the arrow keys between navigating the list (SELECT) and scrolling the
+# preview (SCROLL). fzf can't recolor panes at runtime, so the mode is shown via
+# the border label, the preview label, the prompt, and the pointer glyph (▶ ⇄ ↕).
+# Shift+↑/↓ always page the preview. Populates `_PSCROLL` to splat into the fzf call.
+#   $1 = per-session state file   $2 = the finder's normal prompt (default "> ")
+_pscroll() {
+  local sf=$1 navp=${2:-> }
+  local sel="change-border-label( ▶ SELECT — Tab to scroll )+change-preview-label( preview )+change-prompt($navp)+change-pointer(▶)"
+  local scr="change-border-label( ↕ SCROLL PREVIEW — Tab to select )+change-preview-label( ↕ SCROLLING )+change-prompt(↕ $navp)+change-pointer(↕)"
+  _PSCROLL=(
+    --border rounded
+    --border-label ' ▶ SELECT — Tab to scroll '
+    --preview-label ' preview '
+    --prompt "$navp"
+    --pointer '▶'
+    --bind "tab:transform:[ -e $sf ] && { rm -f $sf; echo '$sel'; } || { : > $sf; echo '$scr'; }"
+    --bind "up:transform:[ -e $sf ] && echo preview-up || echo up"
+    --bind "down:transform:[ -e $sf ] && echo preview-down || echo down"
+    --bind shift-up:preview-page-up
+    --bind shift-down:preview-page-down
+  )
+}
+
 # Show all aliases and their descriptions
 function show_aliases() {
   echo "\n📚 Available Aliases:\n"
@@ -66,6 +91,9 @@ function fuzzy_search_content() {
     return 1
   fi
 
+  local sf="${TMPDIR:-/tmp}/.pscroll.$$.$RANDOM"   # Tab-toggle scroll state
+  local -a _PSCROLL; _pscroll "$sf" 'Search> '
+
   # rg emits "file:line:content". awk reprints the path as a header when it
   # changes, indents each match, strips color from file/line, and appends hidden
   # \t<file>\t<line> fields that fzf uses for the preview ({2}/{3}) and to open.
@@ -73,25 +101,28 @@ function fuzzy_search_content() {
 
   : | fzf -i \
     --ansi \
+    --highlight-line \
     --disabled \
     --reverse \
     --delimiter='\t' \
     --with-nth=1 \
     --query="${1:-}" \
-    --prompt 'Search> ' \
     --header 'Type to search file contents | Enter: open in VS Code | Esc: quit' \
+    "${_PSCROLL[@]}" \
     --bind "start:reload:$RELOAD" \
     --bind "change:reload:$RELOAD" \
     --bind "enter:become([ -n {2} ] && code --goto {2}:{3})" \
-    --preview 'if command -v bat &> /dev/null; then bat --theme="TwoDark" --color=always --style=numbers --highlight-line {3} {2} 2>/dev/null; else cat -n {2} 2>/dev/null; fi' \
+    --preview 'if command -v bat &> /dev/null; then bat --theme="TwoDark" --color=always --style=numbers --highlight-line {3} {2} 2>/dev/null | sed "s/48;2;43;49;58/48;2;52;87;122/g"; else cat -n {2} 2>/dev/null; fi' \
     --preview-window='right:60%:wrap:+{3}-/2' \
-    --bind shift-up:preview-page-up,shift-down:preview-page-down \
     --bind 'ctrl-/:change-preview-window(down|hidden|)' \
-    --color='fg:#f8f8f2,fg+:#f8f8f2,bg+:#49483e,hl:#66d9ef,hl+:#a1efe4,info:#a6e22e,prompt:#61afef,pointer:#61afef,marker:#e6db74,spinner:#ae81ff,header:#75715e'
+    --color='fg:#f8f8f2,fg+:#ffffff:bold,bg+:#34577a,hl:#66d9ef,hl+:#a1efe4,info:#a6e22e,prompt:#61afef,pointer:#61afef,marker:#e6db74,spinner:#ae81ff,header:#75715e'
+  rm -f "$sf"
 }
 
 # Fuzzy find files with preview (Sublime Text style)
 function fuzzy_find_file() {
+  local sf="${TMPDIR:-/tmp}/.pscroll.$$.$RANDOM"   # Tab-toggle scroll state
+  local -a _PSCROLL; _pscroll "$sf" '> '
   find . -type f \
     ! -path "*/\.git/*" \
     ! -path "*/node_modules/*" \
@@ -114,18 +145,20 @@ function fuzzy_find_file() {
   fzf -i -e \
     --reverse \
     --ansi \
+    --highlight-line \
     --with-nth=1 \
     --delimiter=$'\t' \
     --preview 'file=$(echo {} | awk "{print \$NF}"); if command -v bat &> /dev/null; then bat --theme="TwoDark" --color=always --style=numbers --line-range :500 "$file"; else cat -n "$file" | head -500; fi' \
     --preview-window='right:60%:wrap' \
-    --bind shift-up:preview-page-up,shift-down:preview-page-down \
+    "${_PSCROLL[@]}" \
     --bind 'ctrl-/:change-preview-window(down|hidden|)' \
     --tiebreak=begin \
     --select-1 \
     --query="$1" \
-    --color='fg:#f8f8f2,fg+:#f8f8f2,bg+:#49483e,hl:#66d9ef,hl+:#a1efe4,info:#a6e22e,prompt:#61afef,pointer:#61afef,marker:#e6db74,spinner:#ae81ff,header:#75715e' |
+    --color='fg:#f8f8f2,fg+:#ffffff:bold,bg+:#34577a,hl:#66d9ef,hl+:#a1efe4,info:#a6e22e,prompt:#61afef,pointer:#61afef,marker:#e6db74,spinner:#ae81ff,header:#75715e' |
   awk '{print $NF}' |
   xargs -I {} code "$(git rev-parse --show-toplevel 2>/dev/null || echo .)" "{}"
+  rm -f "$sf"
 }
 
 # Checkout git branch with preview
