@@ -14,6 +14,7 @@ function show_aliases() {
   echo "  reload                 - Reload .zshrc configuration"
   echo "  funcs                  - Edit dev functions/aliases (this toolkit)"
   echo "  secrets                - Edit API keys / machine-local (~/.zshrc.local)"
+  echo "  zbak                   - List & delete old ~/.zshrc backups"
   echo ""
   echo "Navigation:"
   echo "  dev                    - cd to ~/Documents/dev"
@@ -237,6 +238,37 @@ alias zshrc='code ~/.zshrc'
 alias reload='source ~/.zshrc && echo "✓ .zshrc reloaded"'
 alias funcs='code ~/.config/zsh/functions.zsh'   # edit this toolkit (the file your shell loads)
 alias secrets='code ~/.zshrc.local'              # edit API keys / machine-local config
+
+# List ~/.zshrc backups and multi-select which to delete (Tab=mark, Enter=confirm, Esc=cancel).
+zbak() {
+  local -a files
+  files=( ~/.zshrc*(N) )                 # all .zshrc* ...
+  files=( ${files:#$HOME/.zshrc} )       # ... minus the live config ...
+  files=( ${files:#$HOME/.zshrc.local} ) # ... and the secrets file
+  if (( ${#files} == 0 )); then
+    echo "No ~/.zshrc backups found."
+    return 0
+  fi
+
+  local picks
+  picks=$(printf '%s\n' "${files[@]}" |
+    fzf --multi --reverse --height 60% \
+        --header 'Mark backups to DELETE: Tab=mark · Enter=confirm · Esc=cancel' \
+        --preview 'if command -v bat >/dev/null 2>&1; then bat --color=always --style=numbers {} 2>/dev/null | head -60; else head -60 {}; fi')
+  [ -z "$picks" ] && { echo "Nothing selected — no files deleted."; return 0; }
+
+  echo "Selected for deletion:"; print -r -- "$picks" | sed 's/^/  /'
+  echo -n "Delete the above? [y/N] "
+  local ans; read -r ans
+  if [[ "$ans" == [yY]* ]]; then
+    print -r -- "$picks" | while IFS= read -r f; do
+      [ -n "$f" ] && rm -- "$f" && echo "  ✗ deleted $f"
+    done
+    echo "Done."
+  else
+    echo "Cancelled — no files deleted."
+  fi
+}
 
 # Navigation
 alias dev="cd ~/Documents/dev"
