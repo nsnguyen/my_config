@@ -16,6 +16,9 @@ The installer:
 2. installs the dependencies via `brew bundle` (the `Brewfile`),
 3. adds a `source` line to `~/.zshrc` (idempotent).
 
+Before touching `~/.zshrc` it makes a **timestamped backup** and **warns about any
+function/alias names it would override** on that machine (yours load last, so they win).
+
 Then `source ~/.zshrc` (or open a new terminal) and run `help`.
 
 ## What you get
@@ -46,6 +49,10 @@ in `~/.zshrc.local` (gitignored, never shared). Keep it that way.
 
 ## Editing
 
+Don't remember where anything lives — just run `help`, or:
+- **`funcs`** — edit the toolkit (opens this repo on the main machine)
+- **`secrets`** — edit `~/.zshrc.local` (API keys / machine-local)
+
 On my main machine `~/.config/zsh/functions.zsh` is a symlink to this repo, so
-edits here are live. After changing something: `git commit && git push`, then on
-other machines re-run the install one-liner.
+edits via `funcs` are live. After changing something: `git commit && git push`,
+then on other machines re-run the install one-liner.

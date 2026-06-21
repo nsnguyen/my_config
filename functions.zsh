@@ -12,6 +12,8 @@ function show_aliases() {
   echo "  help                   - Show this help message"
   echo "  zshrc                  - View .zshrc file"
   echo "  reload                 - Reload .zshrc configuration"
+  echo "  funcs                  - Edit dev functions/aliases (this toolkit)"
+  echo "  secrets                - Edit API keys / machine-local (~/.zshrc.local)"
   echo ""
   echo "Navigation:"
   echo "  dev                    - cd to ~/Documents/dev"
@@ -233,6 +235,12 @@ function git_diff_viewer() {
 alias help='show_aliases'
 alias zshrc='bat ~/.zshrc || cat ~/.zshrc'
 alias reload='source ~/.zshrc && echo "✓ .zshrc reloaded"'
+alias secrets='code ~/.zshrc.local'      # edit API keys / machine-local config
+# edit this toolkit — opens the my_config repo on the main machine (so you can commit + push)
+funcs() {
+  if [ -d ~/my_config ]; then code ~/my_config ~/my_config/functions.zsh
+  else code ~/.config/zsh/functions.zsh; fi
+}
 
 # Navigation
 alias dev="cd ~/Documents/dev"
