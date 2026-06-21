@@ -9,5 +9,5 @@ brew "fd"         # fast file find
 brew "gh"         # GitHub CLI — PR list in gg, and this installer
 brew "git-delta"  # prettier diffs in gg (falls back to plain if absent)
 
-# VS Code provides the `code` CLI that ff / fa use to open files
-cask "visual-studio-code"
+# Note: VS Code (the `code` CLI that ff/fa use) is intentionally NOT a cask here.
+# install.sh installs it only if you don't already have it — see that script.

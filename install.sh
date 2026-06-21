@@ -26,6 +26,19 @@ else
   warn "Homebrew not found — install it from https://brew.sh, then re-run."
 fi
 
+# VS Code — ff/fa need its `code` CLI. Only install if it's actually missing.
+if command -v code >/dev/null 2>&1; then
+  say "VS Code present (code CLI found) — skipping."
+elif [ -d "/Applications/Visual Studio Code.app" ] || [ -d "$HOME/Applications/Visual Studio Code.app" ]; then
+  warn "VS Code is installed, but its 'code' CLI isn't on PATH."
+  warn "In VS Code: Cmd+Shift+P -> 'Shell Command: Install code command in PATH'."
+elif command -v brew >/dev/null 2>&1; then
+  say "VS Code not found — installing via Homebrew..."
+  brew install --cask visual-studio-code || warn "VS Code install failed — get it at https://code.visualstudio.com"
+else
+  warn "VS Code not found — install from https://code.visualstudio.com (ff/fa need its 'code' CLI)."
+fi
+
 if grep -qF '.config/zsh/functions.zsh' "$RC" 2>/dev/null; then
   say "~/.zshrc already sources functions.zsh — refreshed it, left ~/.zshrc untouched."
 else
