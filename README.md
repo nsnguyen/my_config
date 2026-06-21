@@ -5,11 +5,10 @@ that I carry between machines. One file (`functions.zsh`), one command to instal
 
 ## Install (no clone needed)
 
-On a machine with the [GitHub CLI](https://cli.github.com) authed (`gh auth login`):
+One line — no `gh`, no clone, just `curl`:
 
 ```sh
-gh api -H "Accept: application/vnd.github.raw" \
-  repos/nsnguyen/my_config/contents/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/nsnguyen/my_config/main/install.sh | bash
 ```
 
 The installer:
@@ -18,9 +17,6 @@ The installer:
 3. adds a `source` line to `~/.zshrc` (idempotent).
 
 Then `source ~/.zshrc` (or open a new terminal) and run `help`.
-
-> If you ever make this repo **public**, the install simplifies to:
-> `curl -fsSL https://raw.githubusercontent.com/nsnguyen/my_config/main/install.sh | bash`
 
 ## What you get
 

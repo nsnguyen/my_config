@@ -1,30 +1,23 @@
 #!/usr/bin/env bash
-# my_config — one-line install (no manual clone needed).
+# my_config — one-line install (no clone, no gh needed; this repo is public):
 #
-#   gh api -H "Accept: application/vnd.github.raw" \
-#     repos/nsnguyen/my_config/contents/install.sh | bash
-#
-# (If you make the repo public, you can use curl instead:)
 #   curl -fsSL https://raw.githubusercontent.com/nsnguyen/my_config/main/install.sh | bash
+#
 set -euo pipefail
 
-REPO="nsnguyen/my_config"
+BASE="https://raw.githubusercontent.com/nsnguyen/my_config/main"
 ZDIR="$HOME/.config/zsh"
 
-say() { printf '\033[1;36m→\033[0m %s\n' "$1"; }
-
-command -v gh >/dev/null 2>&1 || {
-  echo "Need the GitHub CLI first:  brew install gh && gh auth login"; exit 1; }
-
-raw() { gh api -H "Accept: application/vnd.github.raw" "repos/$REPO/contents/$1"; }
+say()   { printf '\033[1;36m→\033[0m %s\n' "$1"; }
+fetch() { curl -fsSL "$BASE/$1"; }
 
 mkdir -p "$ZDIR"
 say "Installing functions.zsh -> $ZDIR/functions.zsh"
-raw functions.zsh > "$ZDIR/functions.zsh"
+fetch functions.zsh > "$ZDIR/functions.zsh"
 
 if command -v brew >/dev/null 2>&1; then
   say "Installing dependencies (brew bundle)"
-  tmp="$(mktemp)"; raw Brewfile > "$tmp"; brew bundle --file="$tmp" || true; rm -f "$tmp"
+  tmp="$(mktemp)"; fetch Brewfile > "$tmp"; brew bundle --file="$tmp" || true; rm -f "$tmp"
 else
   echo "  ! Homebrew not found — install it from https://brew.sh, then re-run."
 fi
