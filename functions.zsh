@@ -83,11 +83,11 @@ function fuzzy_search_content() {
     --bind "start:reload:$RELOAD" \
     --bind "change:reload:$RELOAD" \
     --bind "enter:become([ -n {2} ] && code --goto {2}:{3})" \
-    --preview 'if command -v bat &> /dev/null; then bat --theme="Monokai Extended Bright" --color=always --style=numbers --highlight-line {3} {2} 2>/dev/null; else cat -n {2} 2>/dev/null; fi' \
+    --preview 'if command -v bat &> /dev/null; then bat --theme="TwoDark" --color=always --style=numbers --highlight-line {3} {2} 2>/dev/null; else cat -n {2} 2>/dev/null; fi' \
     --preview-window='right:60%:wrap:+{3}-/2' \
     --bind shift-up:preview-page-up,shift-down:preview-page-down \
     --bind 'ctrl-/:change-preview-window(down|hidden|)' \
-    --color='fg:#f8f8f2,fg+:#f8f8f2,bg+:#49483e,hl:#66d9ef,hl+:#a1efe4,info:#a6e22e,prompt:#f92672,pointer:#f92672,marker:#e6db74,spinner:#ae81ff,header:#75715e'
+    --color='fg:#f8f8f2,fg+:#f8f8f2,bg+:#49483e,hl:#66d9ef,hl+:#a1efe4,info:#a6e22e,prompt:#61afef,pointer:#61afef,marker:#e6db74,spinner:#ae81ff,header:#75715e'
 }
 
 # Fuzzy find files with preview (Sublime Text style)
@@ -116,14 +116,14 @@ function fuzzy_find_file() {
     --ansi \
     --with-nth=1 \
     --delimiter=$'\t' \
-    --preview 'file=$(echo {} | awk "{print \$NF}"); if command -v bat &> /dev/null; then bat --theme="Monokai Extended Bright" --color=always --style=numbers --line-range :500 "$file"; else cat -n "$file" | head -500; fi' \
+    --preview 'file=$(echo {} | awk "{print \$NF}"); if command -v bat &> /dev/null; then bat --theme="TwoDark" --color=always --style=numbers --line-range :500 "$file"; else cat -n "$file" | head -500; fi' \
     --preview-window='right:60%:wrap' \
     --bind shift-up:preview-page-up,shift-down:preview-page-down \
     --bind 'ctrl-/:change-preview-window(down|hidden|)' \
     --tiebreak=begin \
     --select-1 \
     --query="$1" \
-    --color='fg:#f8f8f2,fg+:#f8f8f2,bg+:#49483e,hl:#66d9ef,hl+:#a1efe4,info:#a6e22e,prompt:#f92672,pointer:#f92672,marker:#e6db74,spinner:#ae81ff,header:#75715e' |
+    --color='fg:#f8f8f2,fg+:#f8f8f2,bg+:#49483e,hl:#66d9ef,hl+:#a1efe4,info:#a6e22e,prompt:#61afef,pointer:#61afef,marker:#e6db74,spinner:#ae81ff,header:#75715e' |
   awk '{print $NF}' |
   xargs -I {} code "$(git rev-parse --show-toplevel 2>/dev/null || echo .)" "{}"
 }
@@ -228,7 +228,7 @@ function git_diff_viewer() {
     --bind shift-up:preview-page-up,shift-down:preview-page-down \
     --bind 'ctrl-/:change-preview-window(down|hidden|)' \
     --bind "ctrl-y:execute-silent(echo {} | awk -F'\t' '{print \$NF}' | pbcopy)+abort" \
-    --color='fg:#f8f8f2,fg+:#f8f8f2,bg+:#49483e,hl:#66d9ef,hl+:#a1efe4,info:#a6e22e,prompt:#f92672,pointer:#f92672,marker:#e6db74,spinner:#ae81ff,header:#75715e'
+    --color='fg:#f8f8f2,fg+:#f8f8f2,bg+:#49483e,hl:#66d9ef,hl+:#a1efe4,info:#a6e22e,prompt:#61afef,pointer:#61afef,marker:#e6db74,spinner:#ae81ff,header:#75715e'
 }
 
 # --------------------------------- aliases ----------------------------------
@@ -293,9 +293,9 @@ alias docker_prune_all="docker system prune -a"
 
 # cat -> bat
 if command -v bat > /dev/null; then
-  alias cat='bat --theme="Dracula" --color=always --style=numbers'
+  alias cat='bat --theme="TwoDark" --color=always --style=numbers'
 elif command -v batcat > /dev/null; then
-  alias cat='batcat --theme="Dracula" --color=always --style=numbers'
+  alias cat='batcat --theme="TwoDark" --color=always --style=numbers'
 fi
 
 # cmux
