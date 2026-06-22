@@ -97,7 +97,7 @@ function fuzzy_search_content() {
   # rg emits "file:line:content". awk reprints the path as a header when it
   # changes, indents each match, strips color from file/line, and appends hidden
   # \t<file>\t<line> fields that fzf uses for the preview ({2}/{3}) and to open.
-  local RELOAD='[ -n {q} ] && rg --color=always --line-number --no-heading --with-filename --smart-case --glob "!.git" --glob "!node_modules" --glob "!__pycache__" --glob "!.idea" --glob "!.vscode" --glob "!graphify-out" --glob "!.DS_Store" --glob "!*.pyc" --glob "!*.swp" -- {q} 2>/dev/null | awk '\''BEGIN{e=sprintf("%c",27);esc=e"\\[[0-9;]*m";m=e"[1;35m";d=e"[38;5;248m";r=e"[0m"}{p=index($0,":");f=substr($0,1,p-1);s=substr($0,p+1);k=index(s,":");l=substr(s,1,k-1);c=substr(s,k+1);gsub(esc,"",f);gsub(esc,"",l);if(f!=pv){print m f r "\t" f "\t" l;pv=f}printf "  %s%4s%s  %s\t%s\t%s\n", d, l, r, c, f, l}'\'' || true'
+  local RELOAD='[ -n {q} ] && rg --color=always --line-number --no-heading --with-filename --smart-case --glob "!.git" --glob "!node_modules" --glob "!__pycache__" --glob "!.idea" --glob "!.vscode" --glob "!graphify-out" --glob "!.DS_Store" --glob "!*.pyc" --glob "!*.swp" -- {q} 2>/dev/null | awk '\''BEGIN{e=sprintf("%c",27);esc=e"\\[[0-9;]*m";m=e"[1;35m";d=e"[38;5;248m";r=e"[0m"}{p=index($0,":");f=substr($0,1,p-1);s=substr($0,p+1);k=index(s,":");l=substr(s,1,k-1);c=substr(s,k+1);gsub(esc,"",f);gsub(esc,"",l);if(f!=pv){n++;disp[n]=m f r;hdr[n]=1;ff[n]=f;ll[n]=l;pv=f}n++;disp[n]=sprintf("  %s%4s%s  %s",d,l,r,c);hdr[n]=0;ff[n]=f;ll[n]=l}END{ph=0;for(i=1;i<=n;i++){pa[i]=ph;if(hdr[i])ph=i}nh=0;for(i=n;i>=1;i--){nb[i]=nh;if(hdr[i])nh=i}for(i=1;i<=n;i++)printf "%s\t%s\t%s\t%s\t%s\n",disp[i],ff[i],ll[i],nb[i],pa[i]}'\'' || true'
 
   : | fzf -i \
     --ansi \
@@ -115,6 +115,8 @@ function fuzzy_search_content() {
     --preview 'if command -v bat &> /dev/null; then bat --theme="TwoDark" --color=always --style=numbers --highlight-line {3} {2} 2>/dev/null | sed "s/48;2;43;49;58/48;2;52;87;122/g"; else cat -n {2} 2>/dev/null; fi' \
     --preview-window='right:60%:wrap:+{3}-/2' \
     --bind 'ctrl-/:change-preview-window(down|hidden|)' \
+    --bind "shift-down:transform:[ -e $sf ] && echo preview-page-down || { n={4}; [ \"\$n\" -gt 0 ] && echo \"pos(\$n)\"; }" \
+    --bind "shift-up:transform:[ -e $sf ] && echo preview-page-up || { n={5}; [ \"\$n\" -gt 0 ] && echo \"pos(\$n)\"; }" \
     --color='fg:#f8f8f2,fg+:#ffffff:bold,bg+:#34577a,hl:#66d9ef,hl+:#a1efe4,info:#a6e22e,prompt:#61afef,pointer:#61afef,marker:#e6db74,spinner:#ae81ff,header:#75715e'
   rm -f "$sf"
 }
