@@ -269,7 +269,7 @@ function git_diff_viewer() {
 alias help='show_aliases'
 alias zshrc='code ~/.zshrc'
 alias reload='source ~/.zshrc && echo "✓ .zshrc reloaded"'
-alias funcs='code ~/.config/zsh/functions.zsh'   # edit this toolkit (the file your shell loads)
+alias funcs='code ~/.config/zsh/functions.zsh(:A)'   # edit this toolkit (resolves symlink -> real repo file, opens in VS Code)
 alias secrets='code ~/.zshrc.local'              # edit API keys / machine-local config
 
 # List ~/.zshrc backups and multi-select which to delete (Tab=mark, Enter=confirm, Esc=cancel).
